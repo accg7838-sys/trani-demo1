@@ -1,0 +1,939 @@
+<!DOCTYPE html>
+<html lang="mn">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Төмөр замын сонголт – 10 түвшин</title>
+    <style>
+      * {
+        box-sizing: border-box;
+        font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+          sans-serif;
+      }
+      body {
+        margin: 0;
+        min-height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: stretch;
+        background: #0f172a;
+      }
+      .app {
+        width: 100%;
+        max-width: 460px;
+        padding: 14px;
+      }
+      .panel {
+        background: #f8fafc;
+        border-radius: 22px;
+        padding: 16px 18px 14px;
+        box-shadow: 0 18px 40px rgba(0, 0, 0, 0.45);
+      }
+      .hidden {
+        display: none !important;
+      }
+      h1 {
+        margin: 0 0 6px;
+      }
+      .btn {
+        border: none;
+        padding: 8px 16px;
+        border-radius: 999px;
+        background: linear-gradient(135deg, #fb923c, #facc15);
+        color: #111827;
+        font-weight: 600;
+        font-size: 13px;
+        cursor: pointer;
+        box-shadow: 0 7px 16px rgba(0, 0, 0, 0.25);
+        transition: transform 0.1s, box-shadow 0.1s, filter 0.1s;
+      }
+      .btn:hover {
+        transform: translateY(-1px);
+        filter: brightness(1.05);
+        box-shadow: 0 10px 18px rgba(0, 0, 0, 0.3);
+      }
+      .btn:active {
+        transform: translateY(1px) scale(0.98);
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.35);
+      }
+      .btn-secondary {
+        background: linear-gradient(135deg, #6366f1, #22c55e);
+        color: #f9fafb;
+      }
+      .btn-ghost {
+        background: transparent;
+        border: 1px solid rgba(15, 23, 42, 0.25);
+        box-shadow: none;
+        font-weight: 500;
+      }
+
+      input,
+      select {
+        width: 100%;
+        border-radius: 12px;
+        border: 1px solid #cbd5e1;
+        padding: 6px 8px;
+        font-size: 13px;
+        outline: none;
+      }
+      input:focus,
+      select:focus {
+        border-color: #fb923c;
+        box-shadow: 0 0 0 2px rgba(251, 146, 60, 0.35);
+      }
+      .row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-bottom: 8px;
+      }
+      .col-6 {
+        flex: 1 1 48%;
+        min-width: 180px;
+      }
+      .field-label {
+        font-size: 12px;
+        margin-bottom: 3px;
+        font-weight: 500;
+      }
+      .step-indicator {
+        font-size: 12px;
+        opacity: 0.75;
+        margin-bottom: 4px;
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 12px;
+        margin-bottom: 8px;
+      }
+      th,
+      td {
+        border-bottom: 1px solid #e2e8f0;
+        padding: 3px 4px;
+        text-align: left;
+      }
+      th {
+        background: #e5e7eb;
+        font-weight: 600;
+      }
+      .select-gender {
+        width: auto;
+      }
+      #setup-error {
+        color: #dc2626;
+        font-size: 12px;
+        min-height: 16px;
+        margin-top: 6px;
+      }
+
+      .hud {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 8px;
+        gap: 8px;
+      }
+      .level-pill {
+        padding: 4px 10px;
+        border-radius: 999px;
+        background: #e5e7eb;
+        font-size: 12px;
+        font-weight: 600;
+      }
+      .question-main {
+        font-size: 14px;
+        font-weight: 600;
+      }
+      .level-desc {
+        font-size: 12px;
+        opacity: 0.85;
+        margin-top: 2px;
+      }
+
+      .scene {
+        position: relative;
+        width: 100%;
+        height: 260px;
+        border-radius: 18px;
+        margin: 8px 0;
+        background: linear-gradient(180deg, #bbf7d0, #4ade80);
+        overflow: hidden;
+      }
+      /* Y зам – дээш харсан, салбар ±30° */
+      .stem {
+        position: absolute;
+        width: 6px;
+        height: 120px;
+        background: #2563eb;
+        left: 50%;
+        bottom: 0;
+        transform: translateX(-50%);
+        border-radius: 999px;
+      }
+      .branch {
+        position: absolute;
+        width: 6px;
+        height: 160px;
+        background: #2563eb;
+        left: 50%;
+        bottom: 90px;
+        transform-origin: bottom;
+        border-radius: 999px;
+      }
+      .branch-left {
+        transform: translateX(-50%) rotate(-30deg);
+      }
+      .branch-right {
+        transform: translateX(-50%) rotate(30deg);
+      }
+
+      .train {
+        position: absolute;
+        width: 52px;
+        height: 38px;
+        border-radius: 12px;
+        background: #ef4444;
+        box-shadow: 0 8px 18px rgba(0, 0, 0, 0.4);
+        left: 50%;
+        bottom: 4px;
+        transform: translateX(-50%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #fee2e2;
+        font-size: 22px;
+        z-index: 3;
+      }
+      .train::after {
+        content: "";
+        position: absolute;
+        bottom: -8px;
+        left: 8px;
+        right: 8px;
+        height: 7px;
+        border-radius: 999px;
+        background: #111827;
+      }
+      /* дээшээ гүйдэг анимац */
+      .train.run-left {
+        animation: runLeft 1.4s ease-in-out forwards;
+      }
+      .train.run-right {
+        animation: runRight 1.4s ease-in-out forwards;
+      }
+
+      @keyframes runLeft {
+        0% {
+          transform: translateX(-50%) translateY(0);
+        }
+        40% {
+          transform: translateX(-80%) translateY(-40px);
+        }
+        100% {
+          transform: translateX(-145%) translateY(-120px) rotate(-18deg);
+        }
+      }
+      @keyframes runRight {
+        0% {
+          transform: translateX(-50%) translateY(0);
+        }
+        40% {
+          transform: translateX(-20%) translateY(-40px);
+        }
+        100% {
+          transform: translateX(75%) translateY(-120px) rotate(18deg);
+        }
+      }
+
+      .track-group {
+        position: absolute;
+        width: 140px;
+        min-height: 90px;
+        border-radius: 60px;
+        border: 4px solid #22c55e;
+        background: rgba(248, 250, 252, 0.9);
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: center;
+        gap: 4px;
+        padding: 6px 6px 2px;
+        z-index: 2;
+      }
+      .track-left {
+        top: 40px;
+        left: 10px;
+      }
+      .track-right {
+        top: 40px;
+        right: 10px;
+      }
+
+      .person-chip {
+        position: relative;
+        padding: 3px 7px 15px;
+        border-radius: 14px;
+        background: #e5e7eb;
+        font-size: 11px;
+        font-weight: 500;
+        display: flex;
+        align-items: center;
+        gap: 4px;
+      }
+      .stick {
+        width: 30px;
+        height: 12px;
+        border-radius: 999px;
+        background: #fff;
+        box-shadow: 0 0 0 2px #cbd5f5;
+        position: relative;
+        transform: rotate(15deg); /* хэвтэж байгаа мэдрэмж */
+      }
+      .stick::before {
+        content: "";
+        position: absolute;
+        left: -6px;
+        top: -12px;
+        width: 18px;
+        height: 18px;
+        border-radius: 50%;
+        background: #fff;
+        box-shadow: 0 0 0 2px #cbd5f5;
+      }
+      .person-name {
+        white-space: nowrap;
+      }
+
+      .decision-label {
+        position: absolute;
+        top: 8px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: #f97316;
+        color: #fff;
+        padding: 3px 10px;
+        border-radius: 999px;
+        font-size: 11px;
+        font-weight: 700;
+        z-index: 4;
+        box-shadow: 0 5px 12px rgba(0, 0, 0, 0.35);
+      }
+
+      .scene.shake {
+        animation: shake 0.6s ease-in-out 2;
+      }
+      @keyframes shake {
+        0%,
+        100% {
+          transform: translate(0, 0);
+        }
+        20% {
+          transform: translate(-3px, 2px);
+        }
+        40% {
+          transform: translate(3px, -2px);
+        }
+        60% {
+          transform: translate(-2px, -3px);
+        }
+        80% {
+          transform: translate(2px, 3px);
+        }
+      }
+
+      .choices {
+        display: flex;
+        justify-content: space-between;
+        gap: 8px;
+        margin-top: 4px;
+      }
+
+      .result-box {
+        margin-top: 8px;
+        padding: 9px 10px;
+        border-radius: 16px;
+        background: #e5e7eb;
+        font-size: 12px;
+        display: flex;
+        justify-content: space-between;
+        gap: 8px;
+        align-items: flex-start;
+      }
+      .result-main {
+        font-weight: 700;
+        margin-bottom: 2px;
+      }
+      .result-sub {
+        font-size: 12px;
+      }
+      .result-sainhun {
+        font-size: 11px;
+        margin-top: 4px;
+        padding-top: 3px;
+        border-top: 1px dashed rgba(15, 23, 42, 0.3);
+      }
+      .final-flag {
+        font-size: 10px;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        color: #b91c1c;
+        font-weight: 700;
+        margin-bottom: 3px;
+      }
+      .footer-text {
+        margin-top: 4px;
+        font-size: 11px;
+        text-align: right;
+        color: #4b5563;
+      }
+
+      @media (max-width: 440px) {
+        .scene {
+          height: 250px;
+        }
+        .track-group {
+          width: 130px;
+        }
+        .track-left {
+          left: 4px;
+        }
+        .track-right {
+          right: 4px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="app">
+      <!-- SETUP -->
+      <div id="setup-screen" class="panel">
+        <h1>Төмөр замын сонголт</h1>
+        <p style="font-size: 12px; opacity: 0.85; margin: 4px 0 8px">
+          Эхлээд хүмүүсийн нэрээ бич. Дараа нь <b>10 түвшний</b> “Аль хүнийг
+          алах вэ?” сонголтууд гарна.
+        </p>
+
+        <div class="step-indicator">1-р алхам – чамтай холбоотой хүмүүс</div>
+        <div class="row">
+          <div class="col-6">
+            <div class="field-label">Чиний нэр</div>
+            <input id="player-name" placeholder="Жишээ: Нарансолонго" />
+          </div>
+          <div class="col-6">
+            <div class="field-label">Хайртай (сайн) хүн</div>
+            <input id="hero-name" placeholder="Чамд хамгийн чухал хүн" />
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-6">
+            <div class="field-label">Гэр бүлийн хамгийн ойр хүн</div>
+            <input id="family-name" placeholder="Ээж, ах, эмээ ..." />
+          </div>
+          <div class="col-6">
+            <div class="field-label">Хүүхдийн нэр</div>
+            <input id="child-name" placeholder="Байхгүй бол хүссэн нэр" />
+          </div>
+        </div>
+
+        <hr
+          style="
+            border: none;
+            border-top: 1px dashed #cbd5e1;
+            margin: 10px 0 8px;
+          "
+        />
+
+        <div class="step-indicator">2-р алхам – 5 сайн найз</div>
+        <table>
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Нэр</th>
+              <th>Хүйс</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>1</td>
+              <td>
+                <input id="friend-name-1" placeholder="Хамгийн сайн найз" />
+              </td>
+              <td>
+                <select id="friend-gender-1" class="select-gender">
+                  <option value="F">Эм</option>
+                  <option value="M">Эр</option>
+                </select>
+              </td>
+            </tr>
+            <tr>
+              <td>2</td>
+              <td><input id="friend-name-2" /></td>
+              <td>
+                <select id="friend-gender-2" class="select-gender">
+                  <option value="F">Эм</option>
+                  <option value="M">Эр</option>
+                </select>
+              </td>
+            </tr>
+            <tr>
+              <td>3</td>
+              <td><input id="friend-name-3" /></td>
+              <td>
+                <select id="friend-gender-3" class="select-gender">
+                  <option value="F">Эм</option>
+                  <option value="M">Эр</option>
+                </select>
+              </td>
+            </tr>
+            <tr>
+              <td>4</td>
+              <td><input id="friend-name-4" /></td>
+              <td>
+                <select id="friend-gender-4" class="select-gender">
+                  <option value="F">Эм</option>
+                  <option value="M">Эр</option>
+                </select>
+              </td>
+            </tr>
+            <tr>
+              <td>5</td>
+              <td><input id="friend-name-5" /></td>
+              <td>
+                <select id="friend-gender-5" class="select-gender">
+                  <option value="F">Эм</option>
+                  <option value="M">Эр</option>
+                </select>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+
+        <div class="step-indicator">3-р алхам – 3 дургүй хүн</div>
+        <table>
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Нэр</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>1</td>
+              <td><input id="enemy-name-1" /></td>
+            </tr>
+            <tr>
+              <td>2</td>
+              <td><input id="enemy-name-2" /></td>
+            </tr>
+            <tr>
+              <td>3</td>
+              <td><input id="enemy-name-3" /></td>
+            </tr>
+          </tbody>
+        </table>
+
+        <div id="setup-error"></div>
+
+        <div
+          style="
+            margin-top: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+          "
+        >
+          <div style="font-size: 11px; opacity: 0.7">
+            Бэлэн бол <b>Эхлэх</b> дээр дар.
+          </div>
+          <button class="btn btn-secondary" id="start-btn">
+            Тоглоом эхлэх 🚂
+          </button>
+        </div>
+      </div>
+
+      <!-- LEVEL -->
+      <div id="level-screen" class="panel hidden">
+        <div class="hud">
+          <div>
+            <div class="level-pill" id="level-label">Түвшин 1 / 10</div>
+            <div class="question-main">Аль хүнийг алах вэ?</div>
+            <div class="level-desc" id="level-desc"></div>
+          </div>
+          <button class="btn btn-ghost" id="restart-btn">Дахин эхлэх</button>
+        </div>
+
+        <div class="scene" id="scene">
+          <div class="stem"></div>
+          <div class="branch branch-left"></div>
+          <div class="branch branch-right"></div>
+
+          <div class="decision-label" id="decision-label">
+            ЯМАР ЗАМЫГ СОНГОХ ВЭ?
+          </div>
+
+          <div class="track-group track-left" id="left-group"></div>
+          <div class="track-group track-right" id="right-group"></div>
+
+          <div class="train" id="train">🚂</div>
+        </div>
+
+        <div class="choices">
+          <button class="btn" id="choose-left">Зүүн зам – эднийг алах</button>
+          <button class="btn" id="choose-right">
+            Баруун зам – эднийг алах
+          </button>
+        </div>
+
+        <div id="result-box" class="result-box hidden">
+          <div>
+            <div class="final-flag hidden" id="final-flag">Эцсийн түвшин</div>
+            <div class="result-main" id="result-main"></div>
+            <div class="result-sub" id="result-sub"></div>
+            <div class="result-sainhun" id="result-sainhun"></div>
+            <div class="footer-text" id="footer-thanks"></div>
+          </div>
+          <div>
+            <button class="btn btn-secondary" id="next-btn">
+              Дараагийн түвшин ➜
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      const TOTAL_LEVELS = 10;
+      const st = {
+        playerName: "",
+        heroName: "",
+        familyName: "",
+        childName: "",
+        friends: [],
+        enemies: [],
+        level: 1,
+        meta: {},
+        results: [],
+      };
+
+      const $ = (id) => document.getElementById(id);
+      const shuffle = (a) =>
+        a
+          .map((x) => ({ x, r: Math.random() }))
+          .sort((a, b) => a.r - b.r)
+          .map((o) => o.x);
+      const rand = (a) =>
+        !a || !a.length ? null : a[Math.floor(Math.random() * a.length)];
+
+      function collectSetup() {
+        const p = $("player-name").value.trim() || "Чи өөрөө";
+        const h = $("hero-name").value.trim();
+        const f = $("family-name").value.trim() || "Гэр бүлийн хүн";
+        const c = $("child-name").value.trim() || "Чиний хүүхэд";
+        if (!h) {
+          $("setup-error").textContent = "Хайртай (сайн) хүний нэрээ бич.";
+          return null;
+        }
+
+        const friends = [];
+        for (let i = 1; i <= 5; i++) {
+          const name = $("friend-name-" + i).value.trim();
+          const gender = $("friend-gender-" + i).value;
+          if (name) friends.push({ name, gender });
+        }
+        if (friends.length < 2) {
+          $("setup-error").textContent = "Дор хаяж 2 найзын нэр оруул.";
+          return null;
+        }
+
+        const enemies = [];
+        for (let i = 1; i <= 3; i++) {
+          const n = $("enemy-name-" + i).value.trim();
+          if (n) enemies.push(n);
+        }
+        if (!enemies.length) {
+          $("setup-error").textContent = "Ядаж 1 дургүй хүний нэр бич.";
+          return null;
+        }
+
+        $("setup-error").textContent = "";
+        st.playerName = p;
+        st.heroName = h;
+        st.familyName = f;
+        st.childName = c;
+        st.friends = friends;
+        st.enemies = enemies;
+        st.level = 1;
+        st.meta = {};
+        st.results = [];
+        return st;
+      }
+
+      function buildLevel(lv) {
+        const s = st;
+        const best = s.friends[0];
+        const second = s.friends[1] || best;
+        const en = s.enemies;
+        const e1 = rand(en) || "Дургүй хүн";
+        const e2 = rand(en.filter((x) => x !== e1)) || e1;
+        const fem = s.friends.filter((f) => f.gender === "F");
+        const male = s.friends.filter((f) => f.gender === "M");
+        const data = {
+          desc: "",
+          left: [],
+          right: [],
+          final: lv === TOTAL_LEVELS,
+        };
+
+        switch (lv) {
+          case 1: {
+            let f = fem.length ? rand(fem) : null;
+            let m = male.length ? rand(male) : null;
+            if (!f || !m) {
+              const sh = shuffle(s.friends);
+              f = sh[0];
+              m = sh[1];
+            }
+            const leftIsFemale = Math.random() < 0.5;
+            const lf = leftIsFemale ? f : m;
+            const rf = leftIsFemale ? m : f;
+
+            const lfLabel =
+              (lf.gender === "M" ? "Эрэгтэй найз – " : "Эмэгтэй найз – ") +
+              lf.name;
+            const rfLabel =
+              (rf.gender === "M" ? "Эрэгтэй найз – " : "Эмэгтэй найз – ") +
+              rf.name;
+
+            data.desc = "1-р түвшин: Эрэгтэй найз vs Эмэгтэй найз.";
+            data.left = [lfLabel];
+            data.right = [rfLabel];
+            st.meta[1] = {
+              left: { friend: lf, gender: lf.gender },
+              right: { friend: rf, gender: rf.gender },
+            };
+            break;
+          }
+          case 2: {
+            const r1 = st.results.find((r) => r.level === 1);
+            const choice = r1 ? r1.choice : "left";
+            const meta1 = st.meta[1];
+            const chosen = meta1 ? meta1[choice] : null;
+            let left, right;
+            if (chosen) {
+              const kName = chosen.friend.name;
+              if (chosen.gender === "F") {
+                const m = rand(male) || { name: "Эр найз" };
+                if (choice === "left") {
+                  left = [kName + " (өмнө нь дайрсан)"];
+                  right = [m.name + " (эрэгтэй найз)", "Аав"];
+                } else {
+                  right = [kName + " (өмнө нь дайрсан)"];
+                  left = [m.name + " (эрэгтэй найз)", "Аав"];
+                }
+              } else {
+                const f2 = rand(fem) || { name: "Эм найз" };
+                if (choice === "left") {
+                  left = [kName + " (өмнө нь дайрсан)"];
+                  right = [f2.name + " (эмэгтэй найз)", "Ээж"];
+                } else {
+                  right = [kName + " (өмнө нь дайрсан)"];
+                  left = [f2.name + " (эмэгтэй найз)", "Ээж"];
+                }
+              }
+            } else {
+              left = ["Ээж"];
+              right = ["Аав"];
+            }
+
+            data.desc =
+              "2-р түвшин: Өмнөх шийдвэрийн хүйсээс шалтгаалаад нэг талд Ээж/Аав нэмэгдлээ.";
+            data.left = left;
+            data.right = right;
+            break;
+          }
+          case 3: {
+            data.desc =
+              "3-р түвшин: Хамгийн сайн 2 найз vs дургүй хүн + сайн хүн.";
+            data.left = [
+              best.name + " (хамгийн сайн найз)",
+              second.name + " (2-р сайн найз)",
+            ];
+            data.right = [e1 + " (дургүй хүн)", s.heroName + " (сайн хүн)"];
+            break;
+          }
+          case 4: {
+            data.desc = "4-р түвшин: Хайртай (сайн) хүн vs хамгийн сайн найз.";
+            data.left = [s.heroName + " (сайн хүн)"];
+            data.right = [best.name + " (хамгийн сайн найз)"];
+            break;
+          }
+          case 5: {
+            const r4 = st.results.find((r) => r.level === 4);
+            const ch = r4 ? r4.choice : "left";
+            if (ch === "left") {
+              data.left = [s.heroName + " (сайн хүн)"];
+              data.right = [
+                best.name + " (найз)",
+                e1 + " (дургүй хүн нэмэгдсэн)",
+              ];
+            } else {
+              data.left = [
+                s.heroName + " (сайн хүн)",
+                e1 + " (дургүй хүн нэмэгдсэн)",
+              ];
+              data.right = [best.name + " (найз)"];
+            }
+            data.desc =
+              "5-р түвшин: 4-р түвшинд сонгоогүй тал дээр дургүй хүн нэмэгдлээ.";
+            break;
+          }
+          case 6: {
+            data.desc = "6-р түвшин: Чи өөрөө vs хайртай (сайн) хүн.";
+            data.left = [s.playerName + " (чи өөрөө)"];
+            data.right = [s.heroName + " (сайн хүн)"];
+            break;
+          }
+          case 7: {
+            data.desc = "7-р түвшин: Гэр бүл vs хамгийн сайн найз + сайн хүн.";
+            data.left = [s.familyName + " (гэр бүл)"];
+            data.right = [
+              best.name + " (хамгийн сайн найз)",
+              s.heroName + " (сайн хүн)",
+            ];
+            break;
+          }
+          case 8: {
+            data.desc = "8-р түвшин: Ээж vs Аав.";
+            data.left = ["Ээж"];
+            data.right = ["Аав"];
+            break;
+          }
+          case 9: {
+            data.desc = "9-р түвшин: Хүүхэд vs бүх сайн найзууд.";
+            data.left = [s.childName + " (хүүхэд)"];
+            data.right = s.friends.map((f) => f.name + " (найз)");
+            break;
+          }
+          case 10: {
+            data.desc = "10-р түвшин: Бабунаг 👹 vs чиний хайртай, сайн хүн.";
+            data.left = ["Бабунаг 👹"];
+            data.right = [s.heroName + " (сайн хүн)"];
+            data.final = true;
+            break;
+          }
+        }
+        return data;
+      }
+
+      function renderGroup(el, arr) {
+        el.innerHTML = "";
+        arr.forEach((n) => {
+          const chip = document.createElement("div");
+          chip.className = "person-chip";
+          const stDiv = document.createElement("div");
+          stDiv.className = "stick";
+          const nameDiv = document.createElement("div");
+          nameDiv.className = "person-name";
+          nameDiv.textContent = n;
+          chip.appendChild(stDiv);
+          chip.appendChild(nameDiv);
+          el.appendChild(chip);
+        });
+      }
+
+      let curLevelData = null;
+
+      function renderLevel() {
+        const lv = st.level;
+        curLevelData = buildLevel(lv);
+        $("level-label").textContent = "Түвшин " + lv + " / " + TOTAL_LEVELS;
+        $("level-desc").textContent = curLevelData.desc;
+
+        renderGroup($("left-group"), curLevelData.left);
+        renderGroup($("right-group"), curLevelData.right);
+
+        $("train").classList.remove("run-left", "run-right");
+        $("scene").classList.remove("shake");
+        $("decision-label").textContent = "ЯМАР ЗАМЫГ СОНГОХ ВЭ?";
+        $("choose-left").disabled = false;
+        $("choose-right").disabled = false;
+        $("result-box").classList.add("hidden");
+        $("final-flag").classList.toggle("hidden", !curLevelData.final);
+        $("footer-thanks").textContent = "";
+        $("next-btn").textContent =
+          lv === TOTAL_LEVELS ? "Дахин эхлэх 🔁" : "Дараагийн түвшин ➜";
+      }
+
+      function playChoice(side) {
+        $("choose-left").disabled = true;
+        $("choose-right").disabled = true;
+        $("decision-label").textContent =
+          side === "left"
+            ? "Зүүн зам руу явууллаа..."
+            : "Баруун зам руу явууллаа...";
+        const train = $("train");
+        train.classList.remove("run-left", "run-right");
+        train.classList.add(side === "left" ? "run-left" : "run-right");
+        if (st.level === 10) $("scene").classList.add("shake");
+        setTimeout(() => showResult(side), 1400);
+      }
+
+      function showResult(side) {
+        const lv = st.level;
+        const left = curLevelData.left,
+          right = curLevelData.right;
+        st.results.push({
+          level: lv,
+          choice: side,
+          left: [...left],
+          right: [...right],
+        });
+        const killed = side === "left" ? left : right;
+        const saved = side === "left" ? right : left;
+
+        const killedText = killed.length ? killed.join(", ") : "хоосон зам";
+        const savedText = saved.length ? saved.join(", ") : "хоосон зам";
+
+        $("result-main").textContent =
+          'Чи "' + killedText + '" талын хүмүүсийг алахаар сонгов.';
+        $("result-sub").textContent =
+          "Нөгөө тал (" +
+          savedText +
+          ") амьд үлдлээ. Энэ бол зүгээр л тоглоом шүү.";
+        $("result-sainhun").textContent =
+          'Сайн хүн (чиний хайртай хүн): "Чиний шийдвэрийн цаана яг юу байгааг зөвхөн чи л мэднэ."';
+        if (lv === TOTAL_LEVELS) {
+          $("footer-thanks").textContent = "🎮 Тоглосонд баярлалаа.";
+        }
+        $("result-box").classList.remove("hidden");
+      }
+
+      function nextOrRestart() {
+        if (st.level >= TOTAL_LEVELS) {
+          $("level-screen").classList.add("hidden");
+          $("setup-screen").classList.remove("hidden");
+        } else {
+          st.level++;
+          renderLevel();
+        }
+      }
+
+      function restartAll() {
+        $("level-screen").classList.add("hidden");
+        $("setup-screen").classList.remove("hidden");
+      }
+
+      $("start-btn").addEventListener("click", () => {
+        if (!collectSetup()) return;
+        $("setup-screen").classList.add("hidden");
+        $("level-screen").classList.remove("hidden");
+        renderLevel();
+      });
+      $("choose-left").addEventListener("click", () => playChoice("left"));
+      $("choose-right").addEventListener("click", () => playChoice("right"));
+      $("next-btn").addEventListener("click", nextOrRestart);
+      $("restart-btn").addEventListener("click", restartAll);
+    </script>
+  </body>
+</html>
+Sent Write to
